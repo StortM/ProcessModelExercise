@@ -8,7 +8,6 @@ public class ProcessModel {
     private double value;
 
     public ProcessModel(){
-
     }
 
     public String getName() {
