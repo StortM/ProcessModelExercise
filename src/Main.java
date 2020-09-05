@@ -135,6 +135,7 @@ public class Main {
                 iterationCount++;
             }
             //modelling iteration
+            //mulig bug: check udregning
             else if (i == 3 || i == 4){
                 if (modellingCount == modelling.getTimeFrame()) {
                     runIterationWithReturnVal(modelling,processModelList);
@@ -144,7 +145,6 @@ public class Main {
                     modellingCount++;
                 }
                 iterationCount++;
-
             }
 
             //construction iteration
@@ -161,6 +161,7 @@ public class Main {
 
             else {
                 i = -1;
+                continue;
             }
 
             System.out.println("Iteration number " + iterationCount + "\n");
