@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class Main {
         smallProcessModelList.add(new ProcessModel("planning", 2, "end", 0.8, "communication", 0.2, 0));
         smallProcessModelList.add(new ProcessModel("end", 1, 0));
 
-        printSmallProcessModel(smallProcessModelList);
+        //printSmallProcessModel(smallProcessModelList);
 
         //testing process model for method printLargeProcessModel
         List<ProcessModel> largeProcessModelList = new ArrayList<>();
@@ -106,21 +107,19 @@ public class Main {
         int iterationCount = 1;
 
         //initial print
+        DecimalFormat df = new DecimalFormat("####0.0000");
+
         System.out.println("Iteration number " + iterationCount + "\n");
-        System.out.println("The value for communication component is + " + communication.getValue());
-        System.out.println("The value for planning component is + " + planning.getValue());
-        System.out.println("The value for modelling component is + " + modelling.getValue());
-        System.out.println("The value for construction component is + " + construction.getValue());
-        System.out.println("The value for deployment component is + " + deployment.getValue());
+        System.out.println("The value for communication component is " + df.format(communication.getValue()));
+        System.out.println("The value for planning component is + " + df.format(planning.getValue()));
+        System.out.println("The value for modelling component is + " + df.format(modelling.getValue()));
+        System.out.println("The value for construction component is + " + df.format(construction.getValue()));
+        System.out.println("The value for deployment component is + " + df.format(deployment.getValue()) + "\n");
 
         for (int i = 0; deployment.getValue() < 0.95; i++) {
             //communication iteration
             if (i == 0) {
-                double communicationValueToBeRemoved = communication.getValue() * communication.getOutputPercent();
-                ProcessModel destinationModel = findMatchingDestinationObject(communication,processModelList);
-                destinationModel.setValue(destinationModel.getValue() + communicationValueToBeRemoved);
-
-                communication.setValue(communication.getValue() - communicationValueToBeRemoved);
+                runIteration(communication,processModelList);
                 iterationCount++;
             }
 
@@ -135,21 +134,41 @@ public class Main {
                 }
                 iterationCount++;
             }
-/*            //modelling iteration
+            //modelling iteration
             else if (i == 3 || i == 4){
-                double modellingValueToBeRemoved = modelling.getValue() * modelling.getOutputPercent();
-                double modellingReturnValueToBeRemoved = planning.getValue() * modelling.getReturnOutputPercent();
-            }*/
+                if (modellingCount == modelling.getTimeFrame()) {
+                    runIterationWithReturnVal(modelling,processModelList);
+                    modellingCount = 1;
+                }
+                else{
+                    modellingCount++;
+                }
+                iterationCount++;
+
+            }
+
+            //construction iteration
+            else if (i== 5 || i == 6 || i == 7 || i == 8){
+                if (constructionCount == construction.getTimeFrame()){
+                    runIterationWithReturnVal(construction,processModelList);
+                    constructionCount = 1;
+                }
+                else{
+                    constructionCount++;
+                }
+                iterationCount++;
+            }
 
             else {
                 i = -1;
             }
+
             System.out.println("Iteration number " + iterationCount + "\n");
-            System.out.println("The value for communication component is + " + communication.getValue());
-            System.out.println("The value for planning component is + " + planning.getValue());
-            System.out.println("The value for modelling component is + " + modelling.getValue());
-            System.out.println("The value for construction component is + " + construction.getValue());
-            System.out.println("The value for deployment component is + " + deployment.getValue());
+            System.out.println("The value for communication component is " + df.format(communication.getValue()));
+            System.out.println("The value for planning component is + " + df.format(planning.getValue()));
+            System.out.println("The value for modelling component is + " + df.format(modelling.getValue()));
+            System.out.println("The value for construction component is + " + df.format(construction.getValue()));
+            System.out.println("The value for deployment component is + " + df.format(deployment.getValue()) + "\n");
         }
     }
 
@@ -184,6 +203,16 @@ public class Main {
             returnDestinationModel.setValue(returnDestinationModel.getValue() + ReturnValueToBeRemoved);
 
             processModel.setValue(processModel.getValue() - ValueToBeRemoved - ReturnValueToBeRemoved);
+    }
+
+    public static void runIteration(ProcessModel processModel, List<ProcessModel> processModelList){
+        double ValueToBeRemoved = processModel.getValue() * processModel.getOutputPercent();
+
+        ProcessModel destinationModel = findMatchingDestinationObject(processModel,processModelList);
+
+        destinationModel.setValue(destinationModel.getValue() + ValueToBeRemoved);
+
+        processModel.setValue(processModel.getValue() - ValueToBeRemoved);
 
     }
 
